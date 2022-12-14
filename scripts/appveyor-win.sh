@@ -28,8 +28,8 @@ cd ../.. || exit 1
 
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1q.zip && 7z x openssl-1.1.1q.zip || exit 1
 
-wget https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip && 7z x SDL2-devel-2.0.10-VC.zip || exit 1
-export SDL_ROOT="$APPVEYOR_BUILD_FOLDER/SDL2-2.0.10" || exit 1
+wget https://www.libsdl.org/release/SDL2-devel-2.0.16-VC.zip && 7z x SDL2-devel-2.0.16-VC.zip || exit 1
+export SDL_ROOT="$APPVEYOR_BUILD_FOLDER/SDL2-2.0.16" || exit 1
 export SDL_ROOT=${SDL_ROOT//[\\]//} || exit 1
 echo "set(SDL2_INCLUDE_DIRS \"$SDL_ROOT/include\")
 set(SDL2_LIBRARIES \"$SDL_ROOT/lib/x64/SDL2.lib\")

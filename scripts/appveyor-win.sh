@@ -6,19 +6,16 @@ BUILD_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 BUILD_ROOT="$(echo $BUILD_ROOT | sed 's|^/\([a-z]\)|\1:|g')" # replace /c/... by c:/... for cmake to understand it
 echo "BUILD_ROOT=$BUILD_ROOT"
 
-mkdir ninja && cd ninja
-wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip && 7z x ninja-win.zip
-cd ..
-
 mkdir yasm && cd yasm
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe && mv yasm-1.3.0-win64.exe yasm.exe
 cd ..
 
-export PATH="$PWD/ninja:$PWD/yasm:/c/Qt/5.12/msvc2017_64/bin:$PATH"
+export PATH="$PWD/yasm:/c/Qt/5.15/msvc2019_64/bin:$PATH"
 
-scripts/build-ffmpeg.sh . --target-os=win64 --arch=x86_64 --toolchain=msvc
+wget https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip && 7z x ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip
+mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
 
-git clone https://github.com/xiph/opus.git && cd opus && git checkout ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
+git clone https://github.com/xiph/opus.git && cd opus && git checkout v1.3.1
 mkdir build && cd build
 cmake \
 	-G Ninja \
@@ -30,10 +27,10 @@ ninja
 ninja install
 cd ../..
 
-wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1q.zip && 7z x openssl-1.1.1q.zip
+wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
 
-wget https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip && 7z x SDL2-devel-2.0.10-VC.zip
-export SDL_ROOT="$BUILD_ROOT/SDL2-2.0.10"
+wget https://www.libsdl.org/release/SDL2-devel-2.26.1-VC.zip && 7z x SDL2-devel-2.26.1-VC.zip
+export SDL_ROOT="$BUILD_ROOT/SDL2-2.26.1"
 export SDL_ROOT=${SDL_ROOT//[\\]//}
 echo "set(SDL2_INCLUDE_DIRS \"$SDL_ROOT/include\")
 set(SDL2_LIBRARIES \"$SDL_ROOT/lib/x64/SDL2.lib\")

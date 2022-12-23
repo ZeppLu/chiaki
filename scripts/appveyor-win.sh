@@ -46,7 +46,7 @@ PYTHON="C:/Python37/python.exe"
 
 QT_PATH="C:/Qt/5.15/msvc2019_64"
 
-COPY_DLLS="$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll $PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll $SDL_ROOT/lib/x64/SDL2.dll"
+COPY_DLLS="$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll $PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll $SDL_ROOT/lib/x64/SDL2.dll $PWD/ffmpeg-prefix/bin/avcodec-59.dll $PWD/ffmpeg-prefix/bin/avutil-57.dll $PWD/ffmpeg-prefix/bin/swresample-4.dll "
 
 echo "-- Configure"
 

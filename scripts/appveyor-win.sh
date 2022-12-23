@@ -23,8 +23,8 @@ cmake \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INSTALL_PREFIX="$BUILD_ROOT/opus-prefix" \
 	..
-ninja
-ninja install
+ninja -v
+ninja install -v
 cd ../..
 
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip

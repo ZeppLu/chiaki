@@ -2,54 +2,39 @@
 
 set -xe
 
-BUILD_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-BUILD_ROOT="$(echo $BUILD_ROOT | sed 's|^/\([a-z]\)|\1:|g')" # replace /c/... by c:/... for cmake to understand it
-echo "BUILD_ROOT=$BUILD_ROOT"
+# Prepare command line tools
+NASM_VER=2.16.01
+PROTO_VER=3.20.3
+TOOLS_PATH="$(realpath .)/tools-bin"
+mkdir -p "$TOOLS_PATH"
+wget "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VER/win64/nasm-$NASM_VER-win64.zip"
+7z e "nasm-$NASM_VER-win64.zip" -o"$TOOLS_PATH" "nasm-$NASM_VER/nasm.exe"
+wget "https://github.com/protocolbuffers/protobuf/releases/download/v$PROTO_VER/protoc-$PROTO_VER-win64.zip"
+7z e "protoc-$PROTO_VER-win64.zip" -o"$TOOLS_PATH" "bin/protoc.exe"
+export PATH="$TOOLS_PATH:$PATH"
 
-mkdir ninja && cd ninja
-wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip && 7z x ninja-win.zip
-cd ..
+# Build third party libraries through vcpkg
+VCPKG_TRIPLET="x64-windows-release"  # `-release` suffix is required
+VCPKG_ROOT="C:/tools/vcpkg/installed/$VCPKG_TRIPLET"
+vcpkg install --triplet $VCPKG_TRIPLET opus sdl2
 
-mkdir yasm && cd yasm
-wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe && mv yasm-1.3.0-win64.exe yasm.exe
-cd ..
+# Build ffmpeg with hardware decoders on Windows
+scripts/build-ffmpeg.sh . \
+	--target-os=win64 --arch=x86_64 --toolchain=msvc \
+	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
+	--enable-d3d11va --enable-hwaccel=h264_d3d11va --enable-hwaccel=hevc_d3d11va
+FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
 
-export PATH="$PWD/ninja:$PWD/yasm:/c/Qt/5.12/msvc2017_64/bin:$PATH"
+OPENSSL_ROOT="C:/OpenSSL-v111-Win64"
 
-scripts/build-ffmpeg.sh . --target-os=win64 --arch=x86_64 --toolchain=msvc
+QT_ROOT="C:/Qt/5.15/msvc2019_64"
 
-git clone https://github.com/xiph/opus.git && cd opus && git checkout ad8fe90db79b7d2a135e3dfd2ed6631b0c5662ab
-mkdir build && cd build
-cmake \
-	-G Ninja \
-	-DCMAKE_C_COMPILER=cl \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_INSTALL_PREFIX="$BUILD_ROOT/opus-prefix" \
-	..
-ninja
-ninja install
-cd ../..
+PYTHON="C:/Python311-x64/python.exe"
+"$PYTHON" -m pip install protobuf==3.20.*
 
-wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1q.zip && 7z x openssl-1.1.1q.zip
-
-wget https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip && 7z x SDL2-devel-2.0.10-VC.zip
-export SDL_ROOT="$BUILD_ROOT/SDL2-2.0.10"
-export SDL_ROOT=${SDL_ROOT//[\\]//}
-echo "set(SDL2_INCLUDE_DIRS \"$SDL_ROOT/include\")
-set(SDL2_LIBRARIES \"$SDL_ROOT/lib/x64/SDL2.lib\")
-set(SDL2_LIBDIR \"$SDL_ROOT/lib/x64\")" > "$SDL_ROOT/SDL2Config.cmake"
-
-mkdir protoc && cd protoc
-wget https://github.com/protocolbuffers/protobuf/releases/download/v3.9.1/protoc-3.9.1-win64.zip && 7z x protoc-3.9.1-win64.zip
-cd ..
-export PATH="$PWD/protoc/bin:$PATH"
-
-PYTHON="C:/Python37/python.exe"
-"$PYTHON" -m pip install protobuf==3.19.5
-
-QT_PATH="C:/Qt/5.15/msvc2019_64"
-
-COPY_DLLS="$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll $PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll $SDL_ROOT/lib/x64/SDL2.dll"
+COPY_DLLS="$VCPKG_ROOT/bin/opus.dll $VCPKG_ROOT/bin/SDL2.dll \
+$OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll $OPENSSL_ROOT/bin/libssl-1_1-x64.dll"
+COPY_PDBS="$VCPKG_ROOT/bin/opus.pdb $VCPKG_ROOT/bin/SDL2.pdb"
 
 echo "-- Configure"
 
@@ -60,7 +45,7 @@ cmake \
 	-DCMAKE_C_COMPILER=cl \
 	-DCMAKE_C_FLAGS="-we4013" \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_PREFIX_PATH="$BUILD_ROOT/ffmpeg-prefix;$BUILD_ROOT/opus-prefix;$BUILD_ROOT/openssl-1.1/x64;$QT_PATH;$SDL_ROOT" \
+	-DCMAKE_PREFIX_PATH="$FFMPEG_ROOT;$OPENSSL_ROOT;$QT_ROOT;$VCPKG_ROOT" \
 	-DPYTHON_EXECUTABLE="$PYTHON" \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
@@ -86,5 +71,6 @@ echo "-- Deploy"
 mkdir Chiaki && cp build/gui/chiaki.exe Chiaki
 mkdir Chiaki-PDB && cp build/gui/chiaki.pdb Chiaki-PDB
 
-"$QT_PATH/bin/windeployqt.exe" Chiaki/chiaki.exe
+"$QT_ROOT/bin/windeployqt.exe" Chiaki/chiaki.exe
 cp -v $COPY_DLLS Chiaki
+cp -v $COPY_PDBS Chiaki-PDB

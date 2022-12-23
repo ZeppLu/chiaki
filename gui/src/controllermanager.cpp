@@ -227,6 +227,7 @@ void ControllerManager::ControllerClosed(Controller *controller)
 
 Controller::Controller(int device_id, ControllerManager *manager) : QObject(manager)
 {
+	printf("zepp id: %d\n", id);
 	this->id = device_id;
 	this->manager = manager;
 	chiaki_orientation_tracker_init(&this->orientation_tracker);
@@ -236,14 +237,20 @@ Controller::Controller(int device_id, ControllerManager *manager) : QObject(mana
 	controller = nullptr;
 	for(int i=0; i<SDL_NumJoysticks(); i++)
 	{
+		printf("zepp sdl index: %d\n", i);
+		printf("zepp sdl name: %s\n", SDL_GameControllerNameForIndex(i));
 		if(SDL_JoystickGetDeviceInstanceID(i) == device_id)
 		{
+			printf("zepp sdl matched\n");
 			controller = SDL_GameControllerOpen(i);
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-			if(SDL_GameControllerHasSensor(controller, SDL_SENSOR_ACCEL))
+			bool has_accel = SDL_GameControllerHasSensor(controller, SDL_SENSOR_ACCEL);
+			if(has_accel)
 				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_ACCEL, SDL_TRUE);
-			if(SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO))
+			bool has_hyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
+			if(has_gyro)
 				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+			printf("zepu controller accel=%d, gyro=%d\n", has_accel, has_gyro);
 			break;
 #endif
 		}
@@ -402,6 +409,9 @@ inline bool Controller::HandleSensorEvent(SDL_ControllerSensorEvent event)
 		default:
 			return false;
 	}
+	printf("zepu sensor: accel (%f, %f, %f); gyro (%f, %f, %f)\n",
+			state.accel_x, state.accel_y, state.accel_z,
+			state.gyro_x, state.gyro_y, state.gyro_z);
 	chiaki_orientation_tracker_update(
 		&orientation_tracker, state.gyro_x, state.gyro_y, state.gyro_z,
 		state.accel_x, state.accel_y, state.accel_z, event.timestamp * 1000);
@@ -414,6 +424,7 @@ inline bool Controller::HandleTouchpadEvent(SDL_ControllerTouchpadEvent event)
 	auto key = qMakePair(event.touchpad, event.finger);
 	bool exists = touch_ids.contains(key);
 	uint8_t chiaki_id;
+	printf("zepu touchpad: (%f, %f)\n", event.x, event.y);
 	switch(event.type)
 	{
 		case SDL_CONTROLLERTOUCHPADDOWN:

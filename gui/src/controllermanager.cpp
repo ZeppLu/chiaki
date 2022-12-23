@@ -247,7 +247,7 @@ Controller::Controller(int device_id, ControllerManager *manager) : QObject(mana
 			bool has_accel = SDL_GameControllerHasSensor(controller, SDL_SENSOR_ACCEL);
 			if(has_accel)
 				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_ACCEL, SDL_TRUE);
-			bool has_hyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
+			bool has_gyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
 			if(has_gyro)
 				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
 			printf("zepu controller accel=%d, gyro=%d\n", has_accel, has_gyro);

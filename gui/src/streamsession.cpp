@@ -321,7 +321,7 @@ void StreamSession::UpdateGamepads()
 	{
 		if(!controllers.contains(controller_id))
 		{
-			auto controller = ControllerManager::GetInstance()->OpenController(controller_id);
+			auto controller = ControllerManager::GetInstance()->OpenController(controller_id, this->log.GetChiakiLog());
 			if(!controller)
 			{
 				CHIAKI_LOGE(log.GetChiakiLog(), "Failed to open controller %d", controller_id);

@@ -4,6 +4,7 @@
 #define CHIAKI_CONTROLLERMANAGER_H
 
 #include <chiaki/controller.h>
+#include <chiaki/log.h>
 
 #include <QObject>
 #include <QSet>
@@ -48,7 +49,7 @@ class ControllerManager : public QObject
 		~ControllerManager();
 
 		QSet<int> GetAvailableControllers();
-		Controller *OpenController(int device_id);
+		Controller *OpenController(int device_id, ChiakiLog *log);
 
 	signals:
 		void AvailableControllersUpdated();
@@ -61,7 +62,7 @@ class Controller : public QObject
 	friend class ControllerManager;
 
 	private:
-		Controller(int device_id, ControllerManager *manager);
+		Controller(int device_id, ControllerManager *manager, ChiakiLog *log);
 
 #ifdef CHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER
 		void UpdateState(SDL_Event event);
@@ -75,6 +76,7 @@ class Controller : public QObject
 
 		ControllerManager *manager;
 		int id;
+		ChiakiLog *log;
 		ChiakiOrientationTracker orientation_tracker;
 		ChiakiControllerState state;
 

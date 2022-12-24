@@ -211,11 +211,11 @@ QSet<int> ControllerManager::GetAvailableControllers()
 #endif
 }
 
-Controller *ControllerManager::OpenController(int device_id)
+Controller *ControllerManager::OpenController(int device_id, ChiakiLog *log)
 {
 	if(open_controllers.contains(device_id))
 		return nullptr;
-	auto controller = new Controller(device_id, this);
+	auto controller = new Controller(device_id, this, log);
 	open_controllers[device_id] = controller;
 	return controller;
 }
@@ -225,11 +225,12 @@ void ControllerManager::ControllerClosed(Controller *controller)
 	open_controllers.remove(controller->GetDeviceID());
 }
 
-Controller::Controller(int device_id, ControllerManager *manager) : QObject(manager)
+Controller::Controller(int device_id, ControllerManager *manager, ChiakiLog *log) : QObject(manager)
 {
 	printf("zepp id: %d\n", id);
 	this->id = device_id;
 	this->manager = manager;
+	this->log = log;
 	chiaki_orientation_tracker_init(&this->orientation_tracker);
 	chiaki_controller_state_set_idle(&this->state);
 
@@ -237,11 +238,11 @@ Controller::Controller(int device_id, ControllerManager *manager) : QObject(mana
 	controller = nullptr;
 	for(int i=0; i<SDL_NumJoysticks(); i++)
 	{
-		printf("zepp sdl index: %d\n", i);
-		printf("zepp sdl name: %s\n", SDL_GameControllerNameForIndex(i));
+		CHIAKI_LOGI(this->log, "zepp sdl index: %d", i);
+		CHIAKI_LOGI(this->log, "zepp sdl name: %s", SDL_GameControllerNameForIndex(i));
 		if(SDL_JoystickGetDeviceInstanceID(i) == device_id)
 		{
-			printf("zepp sdl matched\n");
+			CHIAKI_LOGI(this->log, "zepp sdl matched");
 			controller = SDL_GameControllerOpen(i);
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 			bool has_accel = SDL_GameControllerHasSensor(controller, SDL_SENSOR_ACCEL);
@@ -250,7 +251,7 @@ Controller::Controller(int device_id, ControllerManager *manager) : QObject(mana
 			bool has_gyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
 			if(has_gyro)
 				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-			printf("zepu controller accel=%d, gyro=%d\n", has_accel, has_gyro);
+			CHIAKI_LOGI(this->log, "zepu controller accel=%d, gyro=%d", has_accel, has_gyro);
 			break;
 #endif
 		}
@@ -409,7 +410,7 @@ inline bool Controller::HandleSensorEvent(SDL_ControllerSensorEvent event)
 		default:
 			return false;
 	}
-	printf("zepu sensor: accel (%f, %f, %f); gyro (%f, %f, %f)\n",
+	CHIAKI_LOGI(this->log, "zepu sensor: accel (%f, %f, %f); gyro (%f, %f, %f)",
 			state.accel_x, state.accel_y, state.accel_z,
 			state.gyro_x, state.gyro_y, state.gyro_z);
 	chiaki_orientation_tracker_update(
@@ -424,7 +425,7 @@ inline bool Controller::HandleTouchpadEvent(SDL_ControllerTouchpadEvent event)
 	auto key = qMakePair(event.touchpad, event.finger);
 	bool exists = touch_ids.contains(key);
 	uint8_t chiaki_id;
-	printf("zepu touchpad: (%f, %f)\n", event.x, event.y);
+	CHIAKI_LOGI(this->log, "zepu touchpad: (%f, %f)", event.x, event.y);
 	switch(event.type)
 	{
 		case SDL_CONTROLLERTOUCHPADDOWN:

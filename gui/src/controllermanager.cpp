@@ -246,12 +246,15 @@ Controller::Controller(int device_id, ControllerManager *manager, ChiakiLog *log
 			controller = SDL_GameControllerOpen(i);
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 			bool has_accel = SDL_GameControllerHasSensor(controller, SDL_SENSOR_ACCEL);
+			int en_accel = 0;
 			if(has_accel)
-				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_ACCEL, SDL_TRUE);
+				en_accel = SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_ACCEL, SDL_TRUE);
 			bool has_gyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
+			int en_gyro = 0;
 			if(has_gyro)
-				SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-			CHIAKI_LOGI(this->log, "zepu controller accel=%d, gyro=%d", has_accel, has_gyro);
+				en_gyro = SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+			CHIAKI_LOGI(this->log, "zepp controller accel=%d, gyro=%d", has_accel, has_gyro);
+			CHIAKI_LOGI(this->log, "zepp controller enable accel=%d, gyro=%d", en_accel, en_gyro);
 			break;
 #endif
 		}
@@ -302,6 +305,7 @@ void Controller::UpdateState(SDL_Event event)
 }
 
 inline bool Controller::HandleButtonEvent(SDL_ControllerButtonEvent event) {
+	CHIAKI_LOGI(this->log, "zepp button %#02x %x", event.button, event.type);
 	ChiakiControllerButton ps_btn;
 	switch(event.button)
 	{
@@ -366,6 +370,7 @@ inline bool Controller::HandleButtonEvent(SDL_ControllerButtonEvent event) {
 }
 
 inline bool Controller::HandleAxisEvent(SDL_ControllerAxisEvent event) {
+	CHIAKI_LOGI(this->log, "zepp axis %d", event.value);
 	switch(event.axis)
 	{
 		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:

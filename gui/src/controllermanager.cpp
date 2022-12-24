@@ -249,10 +249,16 @@ Controller::Controller(int device_id, ControllerManager *manager, ChiakiLog *log
 			int en_accel = 0;
 			if(has_accel)
 				en_accel = SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_ACCEL, SDL_TRUE);
+			if(en_accel < 0) {
+				CHIAKI_LOGE(this->log, "zepp err setting accel: %s", SDL_GetError());
+			}
 			bool has_gyro = SDL_GameControllerHasSensor(controller, SDL_SENSOR_GYRO);
 			int en_gyro = 0;
 			if(has_gyro)
 				en_gyro = SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+			if(en_gyro < 0) {
+				CHIAKI_LOGE(this->log, "zepp err setting gyro: %s", SDL_GetError());
+			}
 			CHIAKI_LOGI(this->log, "zepp controller accel=%d, gyro=%d", has_accel, has_gyro);
 			CHIAKI_LOGI(this->log, "zepp controller enable accel=%d, gyro=%d", en_accel, en_gyro);
 			break;

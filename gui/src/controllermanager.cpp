@@ -311,7 +311,8 @@ void Controller::UpdateState(SDL_Event event)
 }
 
 inline bool Controller::HandleButtonEvent(SDL_ControllerButtonEvent event) {
-	CHIAKI_LOGI(this->log, "zepp button %#02x %x", event.button, event.type);
+	CHIAKI_LOGI(this->log, "zepp button %s=%x",
+			SDL_GameControllerGetStringForButton(static_cast<SDL_GameControllerButton>(event.button)), event.type);
 	ChiakiControllerButton ps_btn;
 	switch(event.button)
 	{
@@ -376,7 +377,8 @@ inline bool Controller::HandleButtonEvent(SDL_ControllerButtonEvent event) {
 }
 
 inline bool Controller::HandleAxisEvent(SDL_ControllerAxisEvent event) {
-	CHIAKI_LOGI(this->log, "zepp axis %d", event.value);
+	CHIAKI_LOGI(this->log, "zepp axis %s=%d",
+			SDL_GameControllerGetStringForAxis(static_cast<SDL_GameControllerAxis>(event.axis)), event.value);
 	switch(event.axis)
 	{
 		case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
@@ -406,6 +408,10 @@ inline bool Controller::HandleAxisEvent(SDL_ControllerAxisEvent event) {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 inline bool Controller::HandleSensorEvent(SDL_ControllerSensorEvent event)
 {
+	CHIAKI_LOGI(this->log, "zepu sensor (accel=%d gyro=%d): (%f, %f, %f)",
+			event.sensor == SDL_SENSOR_ACCEL ? 1 : 0,
+			event.sensor == SDL_SENSOR_GYRO ? 1 : 0,
+			event.data[0], event.data[1], event.data[2]);
 	switch(event.sensor)
 	{
 		case SDL_SENSOR_ACCEL:
@@ -421,9 +427,6 @@ inline bool Controller::HandleSensorEvent(SDL_ControllerSensorEvent event)
 		default:
 			return false;
 	}
-	CHIAKI_LOGI(this->log, "zepu sensor: accel (%f, %f, %f); gyro (%f, %f, %f)",
-			state.accel_x, state.accel_y, state.accel_z,
-			state.gyro_x, state.gyro_y, state.gyro_z);
 	chiaki_orientation_tracker_update(
 		&orientation_tracker, state.gyro_x, state.gyro_y, state.gyro_z,
 		state.accel_x, state.accel_y, state.accel_z, event.timestamp * 1000);
@@ -433,10 +436,10 @@ inline bool Controller::HandleSensorEvent(SDL_ControllerSensorEvent event)
 
 inline bool Controller::HandleTouchpadEvent(SDL_ControllerTouchpadEvent event)
 {
+	CHIAKI_LOGI(this->log, "zepu touchpad: (%f, %f)", event.x, event.y);
 	auto key = qMakePair(event.touchpad, event.finger);
 	bool exists = touch_ids.contains(key);
 	uint8_t chiaki_id;
-	CHIAKI_LOGI(this->log, "zepu touchpad: (%f, %f)", event.x, event.y);
 	switch(event.type)
 	{
 		case SDL_CONTROLLERTOUCHPADDOWN:

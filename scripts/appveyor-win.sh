@@ -9,6 +9,7 @@ echo "BUILD_ROOT=$BUILD_ROOT"
 vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
 VCPKG_ROOT="tools/vcpkg/installed/x64-windows"
 export PATH="/c/$VCPKG_ROOT/tools/yasm:/c/$VCPKG_ROOT/tools/protobuf:$PATH"
+vcpkg list
 
 wget https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip && 7z x ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip
 mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
@@ -36,12 +37,12 @@ cmake \
 	-DCMAKE_C_COMPILER=cl \
 	-DCMAKE_C_FLAGS="-we4013" \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_PREFIX_PATH="C:/$VCPKG_ROOT;$BUILD_ROOT/ffmpeg-prefix;$BUILD_ROOT/openssl-1.1/x64;$QT_PATH" \
+	-DCMAKE_PREFIX_PATH="$BUILD_ROOT/ffmpeg-prefix;$BUILD_ROOT/openssl-1.1/x64;$QT_PATH;C:/$VCPKG_ROOT" \
 	-DPYTHON_EXECUTABLE="$PYTHON" \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \
-	--debug-output \
+	--trace --debug-output \
 	..
 
 echo "-- Build"

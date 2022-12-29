@@ -15,8 +15,8 @@ mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
 
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
 
-which python3
-python3 -m pip install "protobuf>=3"
+PYTHON="C:/Python37-x64/python.exe"
+"$PYTHON" -m pip install "protobuf>=3"
 
 QT_PATH="C:/Qt/5.15/msvc2019_64"
 
@@ -32,6 +32,7 @@ cmake \
 	-DCMAKE_C_FLAGS="-we4013" \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_PREFIX_PATH="C:/$VCPKG_ROOT;$BUILD_ROOT/ffmpeg-prefix;$BUILD_ROOT/openssl-1.1/x64;$QT_PATH" \
+	-DPYTHON_EXECUTABLE="$PYTHON" \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \

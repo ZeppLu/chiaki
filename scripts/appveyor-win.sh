@@ -5,7 +5,6 @@ set -xe
 vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
 VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
 export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$(cygpath $VCPKG_ROOT)/tools/protobuf:$PATH"
-vcpkg list
 
 wget https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip && 7z x ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip
 mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
@@ -62,6 +61,7 @@ echo "-- Deploy"
 mkdir Chiaki && cp build/gui/chiaki.exe Chiaki
 mkdir Chiaki-PDB && cp build/gui/chiaki.pdb Chiaki-PDB
 
-"$QT_PATH/bin/windeployqt.exe" Chiaki/chiaki.exe
+ls -lha Chiaki
+"$QT_ROOT/bin/windeployqt.exe" Chiaki/chiaki.exe
 ls -lha Chiaki
 cp -v $COPY_DLLS Chiaki

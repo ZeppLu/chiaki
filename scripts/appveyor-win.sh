@@ -2,31 +2,29 @@
 
 set -xe
 
-BUILD_ROOT="$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")"
-BUILD_ROOT="$(echo $BUILD_ROOT | sed 's|^/\([a-z]\)|\1:|g')" # replace /c/... by c:/... for cmake to understand it
-echo "BUILD_ROOT=$BUILD_ROOT"
-
 vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
-VCPKG_ROOT="tools/vcpkg/installed/x64-windows"
-export PATH="/c/$VCPKG_ROOT/tools/yasm:/c/$VCPKG_ROOT/tools/protobuf:$PATH"
+VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
+export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$(cygpath $VCPKG_ROOT)/tools/protobuf:$PATH"
 vcpkg list
 
 wget https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip && 7z x ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip
 mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
+FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
 
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
+OPENSSL_ROOT="$(cygpath -m "$(realpath openssl-1.1/x64)")"
 
 PYTHON="C:/Python37-x64/python.exe"
 "$PYTHON" -m pip install "protobuf>=3,<4"
 
-QT_PATH="C:/Qt/5.15/msvc2019_64"
+QT_ROOT="C:/Qt/5.15/msvc2019_64"
 
-COPY_DLLS="/c/$VCPKG_ROOT/bin/SDL2.dll \
-$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll \
-$PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll \
-$PWD/ffmpeg-prefix/bin/avcodec-59.dll \
-$PWD/ffmpeg-prefix/bin/avutil-57.dll \
-$PWD/ffmpeg-prefix/bin/swresample-4.dll"
+COPY_DLLS="$VCPKG_ROOT/bin/SDL2.dll \
+$OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll \
+$OPENSSL_ROOT/bin/libssl-1_1-x64.dll \
+$FFMPEG_ROOT/bin/avcodec-59.dll \
+$FFMPEG_ROOT/bin/avutil-57.dll \
+$FFMPEG_ROOT/bin/swresample-4.dll"
 
 echo "-- Configure"
 
@@ -37,12 +35,12 @@ cmake \
 	-DCMAKE_C_COMPILER=cl \
 	-DCMAKE_C_FLAGS="-we4013" \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_PREFIX_PATH="$BUILD_ROOT/ffmpeg-prefix;$BUILD_ROOT/openssl-1.1/x64;$QT_PATH;C:/$VCPKG_ROOT" \
+	-DCMAKE_PREFIX_PATH="$FFMPEG_ROOT;$OPENSSL_ROOT;$QT_ROOT;$VCPKG_ROOT" \
 	-DPYTHON_EXECUTABLE="$PYTHON" \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \
-	--trace --debug-output \
+	--debug-output \
 	..
 
 echo "-- Build"

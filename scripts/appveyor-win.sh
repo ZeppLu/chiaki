@@ -16,11 +16,16 @@ mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
 
 PYTHON="C:/Python37-x64/python.exe"
-"$PYTHON" -m pip install "protobuf>=3"
+"$PYTHON" -m pip install "protobuf>=3,<4"
 
 QT_PATH="C:/Qt/5.15/msvc2019_64"
 
-COPY_DLLS="$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll $PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll /c/$VCPKG_ROOT/bin/SDL2.dll $PWD/ffmpeg-prefix/bin/avcodec-59.dll $PWD/ffmpeg-prefix/bin/avutil-57.dll $PWD/ffmpeg-prefix/bin/swresample-4.dll "
+COPY_DLLS="/c/$VCPKG_ROOT/bin/SDL2.dll \
+$PWD/openssl-1.1/x64/bin/libcrypto-1_1-x64.dll \
+$PWD/openssl-1.1/x64/bin/libssl-1_1-x64.dll \
+$PWD/ffmpeg-prefix/bin/avcodec-59.dll \
+$PWD/ffmpeg-prefix/bin/avutil-57.dll \
+$PWD/ffmpeg-prefix/bin/swresample-4.dll"
 
 echo "-- Configure"
 
@@ -36,6 +41,7 @@ cmake \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \
+	--debug-output \
 	..
 
 echo "-- Build"

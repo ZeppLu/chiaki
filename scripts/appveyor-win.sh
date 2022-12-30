@@ -9,10 +9,11 @@ PROTO_VER=3.20.3
 TOOLS_PATH="$(realpath .)/tools-bin"
 mkdir -p "$TOOLS_PATH"
 wget "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VER/win64/nasm-$NASM_VER-win64.zip"
-7z x "nasm-$NASM_VER-win64.zip" -o"$TOOLS_PATH" "nasm-$NASM_VER/nasm.exe"
+7z e "nasm-$NASM_VER-win64.zip" -o"$TOOLS_PATH" "nasm-$NASM_VER/nasm.exe"
 wget "https://github.com/protocolbuffers/protobuf/releases/download/v$PROTO_VER/protoc-$PROTO_VER-win64.zip"
-7z x "protoc-$PROTO_VER-win64.zip" -o"$TOOLS_PATH" "bin/protoc.exe"
+7z e "protoc-$PROTO_VER-win64.zip" -o"$TOOLS_PATH" "bin/protoc.exe"
 export PATH="$TOOLS_PATH:$PATH"
+ls -l $TOOLS_PATH
 which nasm
 which protoc
 

@@ -11,6 +11,8 @@ scripts/build-ffmpeg.sh . \
 	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
 	--enable-d3d11va --enable-hwaccel=h264_d3d11va --enable-hwaccel=hevc_d3d11va
 FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
+find "$FFMPEG_ROOT" -name '*.dll' -exec file {} \;
+find "$FFMPEG_ROOT" -name '*.lib' -exec file {} \;
 
 vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
 VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
@@ -30,10 +32,7 @@ QT_ROOT="C:/Qt/5.15/msvc2019_64"
 
 COPY_DLLS="$VCPKG_ROOT/bin/SDL2.dll \
 $OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll \
-$OPENSSL_ROOT/bin/libssl-1_1-x64.dll \
-$FFMPEG_ROOT/bin/avcodec-59.dll \
-$FFMPEG_ROOT/bin/avutil-57.dll \
-$FFMPEG_ROOT/bin/swresample-4.dll"
+$OPENSSL_ROOT/bin/libssl-1_1-x64.dll
 
 echo "-- Configure"
 
@@ -49,7 +48,6 @@ cmake \
 	-DCHIAKI_ENABLE_TESTS=ON \
 	-DCHIAKI_ENABLE_CLI=OFF \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \
-	--debug-output \
 	..
 
 echo "-- Build"
@@ -74,4 +72,4 @@ mkdir Chiaki-PDB && cp build/gui/chiaki.pdb Chiaki-PDB
 ls -lha Chiaki
 "$QT_ROOT/bin/windeployqt.exe" Chiaki/chiaki.exe
 ls -lha Chiaki
-cp -v $COPY_DLLS Chiaki || :
+cp -v $COPY_DLLS Chiaki

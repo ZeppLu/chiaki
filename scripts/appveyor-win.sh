@@ -13,11 +13,12 @@ wget "https://github.com/protocolbuffers/protobuf/releases/download/v$PROTO_VER/
 7z e "protoc-$PROTO_VER-win64.zip" -o"$TOOLS_PATH" "bin/protoc.exe"
 export PATH="$TOOLS_PATH:$PATH"
 
-VCPKG_TRIPLET="x64-windows-release"
+# Build third party libraries through vcpkg
+VCPKG_TRIPLET="x64-windows-release"  # `-release` suffix is required
 VCPKG_ROOT="C:/tools/vcpkg/installed/$VCPKG_TRIPLET"
 vcpkg install --triplet $VCPKG_TRIPLET opus sdl2
-ls -lR $VCPKG_ROOT
 
+# Build ffmpeg with hardware decoders on Windows
 scripts/build-ffmpeg.sh . \
 	--target-os=win64 --arch=x86_64 --toolchain=msvc \
 	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
@@ -31,8 +32,9 @@ QT_ROOT="C:/Qt/5.15/msvc2019_64"
 PYTHON="C:/Python311-x64/python.exe"
 "$PYTHON" -m pip install protobuf==3.20.*
 
-COPY_DLLS="$OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll $OPENSSL_ROOT/bin/libssl-1_1-x64.dll \
-$VCPKG_ROOT/bin/opus.dll $VCPKG_ROOT/bin/SDL2.dll"
+COPY_DLLS="$VCPKG_ROOT/bin/opus.dll $VCPKG_ROOT/bin/SDL2.dll \
+$OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll $OPENSSL_ROOT/bin/libssl-1_1-x64.dll"
+COPY_PDBS="$VCPKG_ROOT/bin/opus.pdb $VCPKG_ROOT/bin/SDL2.pdb"
 
 echo "-- Configure"
 
@@ -52,7 +54,7 @@ cmake \
 
 echo "-- Build"
 
-ninja -v
+ninja
 
 echo "-- Test"
 
@@ -71,3 +73,4 @@ mkdir Chiaki-PDB && cp build/gui/chiaki.pdb Chiaki-PDB
 
 "$QT_ROOT/bin/windeployqt.exe" Chiaki/chiaki.exe
 cp -v $COPY_DLLS Chiaki
+cp -v $COPY_PDBS Chiaki-PDB

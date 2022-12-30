@@ -33,8 +33,6 @@ class ControllerManager : public QObject
 #endif
 		QMap<int, Controller *> open_controllers;
 
-		void ReportEvent(SDL_Event event, const char * where);
-
 		void ControllerClosed(Controller *controller);
 
 	private slots:

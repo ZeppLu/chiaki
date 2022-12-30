@@ -142,35 +142,12 @@ void ControllerManager::UpdateAvailableControllers()
 #endif
 }
 
-void ControllerManager::ReportEvent(SDL_Event event, const char * where) {
-	static const char * EVENT_NAME[10] = {
-		"SDL_CONTROLLERAXISMOTION",
-		"SDL_CONTROLLERBUTTONDOWN",
-		"SDL_CONTROLLERBUTTONUP",
-		"SDL_CONTROLLERDEVICEADDED",
-		"SDL_CONTROLLERDEVICEREMOVED",
-		"SDL_CONTROLLERDEVICEREMAPPED",
-		"SDL_CONTROLLERTOUCHPADDOWN",
-		"SDL_CONTROLLERTOUCHPADMOTION",
-		"SDL_CONTROLLERTOUCHPADUP",
-		"SDL_CONTROLLERSENSORUPDATE"
-	};
-	unsigned ev_idx = static_cast<unsigned>(event.type) - 0x650;
-	ChiakiLog *log = this->open_controllers.first()->log;
-	if(ev_idx < 10) {
-		CHIAKI_LOGI(log, "zepp (%s) got %s", where, EVENT_NAME[ev_idx]);
-	} else {
-		CHIAKI_LOGI(log, "zepp (%s) got non-controller event 0x%x", where, ev_idx + 0x650);
-	}
-}
-
 void ControllerManager::HandleEvents()
 {
 #ifdef CHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
-		ReportEvent(event, "HandleEvents");
 		switch(event.type)
 		{
 			case SDL_JOYDEVICEADDED:
@@ -196,7 +173,6 @@ void ControllerManager::HandleEvents()
 #ifdef CHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER
 void ControllerManager::ControllerEvent(SDL_Event event)
 {
-	ReportEvent(event, "ControllerEvent");
 	int device_id;
 	switch(event.type)
 	{

@@ -2,6 +2,16 @@
 
 set -xe
 
+ls -lR /c/OpenSSL-v111-Win64
+# Prepare command line tools
+NASM_VER=2.16.01
+PROTO_VER=3.20.3
+mkdir -p tools-bin
+wget -O - "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VER/win64/nasm-$NASM_VER-win64.zip" | \
+	7z x -si -tzip -o tools-bin "nasm-$NASM_VER/nasm.exe"
+wget -O - "https://github.com/protocolbuffers/protobuf/releases/download/v$PROTO_VER/protoc-$PROTO_VER-win64.zip" | \
+	7z x -si -tzip -o tools-bin "bin/protoc.exe"
+export PATH="$(realpath tools-bin):$PATH"
 which nasm
 which protoc
 

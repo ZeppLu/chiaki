@@ -2,25 +2,17 @@
 
 set -xe
 
-# temp test
-vcpkg install --triplet x64-windows yasm
+vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
 VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
-export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$PATH"
+export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$(cygpath $VCPKG_ROOT)/tools/protobuf:$PATH"
+
 scripts/build-ffmpeg.sh . \
 	--target-os=win64 --arch=x86_64 --toolchain=msvc \
 	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
 	--enable-d3d11va --enable-hwaccel=h264_d3d11va --enable-hwaccel=hevc_d3d11va
 FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
-find "$FFMPEG_ROOT" -name '*.dll' -exec file {} \;
-find "$FFMPEG_ROOT" -name '*.lib' -exec file {} \;
-
-vcpkg install --triplet x64-windows yasm opus sdl2 protobuf
-VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
-export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$(cygpath $VCPKG_ROOT)/tools/protobuf:$PATH"
-
-#wget https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip && 7z x ffmpeg-n5.1-latest-win64-gpl-shared-5.1.zip
-#mv ffmpeg-n5.1-latest-win64-gpl-shared-5.1 ffmpeg-prefix
-#FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
+find "ffmpeg-prefix" -name '*.dll' -exec file {} \;
+find "ffmpeg-prefix" -name '*.lib' -exec file {} \;
 
 wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
 OPENSSL_ROOT="$(cygpath -m "$(realpath openssl-1.1/x64)")"
@@ -32,7 +24,7 @@ QT_ROOT="C:/Qt/5.15/msvc2019_64"
 
 COPY_DLLS="$VCPKG_ROOT/bin/SDL2.dll \
 $OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll \
-$OPENSSL_ROOT/bin/libssl-1_1-x64.dll
+$OPENSSL_ROOT/bin/libssl-1_1-x64.dll"
 
 echo "-- Configure"
 

@@ -2,7 +2,6 @@
 
 set -xe
 
-choco install -y nasm protoc
 which nasm
 which protoc
 

@@ -2,10 +2,14 @@
 
 set -xe
 
+choco install -y nasm protoc
+which nasm
+which protoc
+
 VCPKG_TRIPLET="x64-windows-static-md"
 VCPKG_ROOT="C:/tools/vcpkg/installed/$VCPKG_TRIPLET"
-vcpkg install --triplet $VCPKG_TRIPLET yasm protobuf opus sdl2
-export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$(cygpath $VCPKG_ROOT)/tools/protobuf:$PATH"
+vcpkg install --triplet $VCPKG_TRIPLET opus sdl2
+ls -lR $VCPKG_ROOT
 
 scripts/build-ffmpeg.sh . \
 	--target-os=win64 --arch=x86_64 --toolchain=msvc \
@@ -18,7 +22,7 @@ wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.
 OPENSSL_ROOT="$(cygpath -m "$(realpath openssl-1.1/x64)")"
 
 PYTHON="C:/Python37-x64/python.exe"
-"$PYTHON" -m pip install "protobuf>=3,<4"
+"$PYTHON" -m pip install protobuf==3.20.*
 
 QT_ROOT="C:/Qt/5.15/msvc2019_64"
 

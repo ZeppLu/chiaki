@@ -6,12 +6,13 @@ ls -lR /c/OpenSSL-v111-Win64
 # Prepare command line tools
 NASM_VER=2.16.01
 PROTO_VER=3.20.3
-mkdir -p tools-bin
+TOOLS_PATH="$(realpath .)/tools-bin"
+mkdir -p "$TOOLS_PATH"
 wget -O - "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VER/win64/nasm-$NASM_VER-win64.zip" | \
-	7z x -si -tzip -o tools-bin "nasm-$NASM_VER/nasm.exe"
+	7z x -si -tzip -o"$TOOLS_PATH" "nasm-$NASM_VER/nasm.exe"
 wget -O - "https://github.com/protocolbuffers/protobuf/releases/download/v$PROTO_VER/protoc-$PROTO_VER-win64.zip" | \
-	7z x -si -tzip -o tools-bin "bin/protoc.exe"
-export PATH="$(realpath tools-bin):$PATH"
+	7z x -si -tzip -o"$TOOLS_PATH" "bin/protoc.exe"
+export PATH="$TOOLS_PATH:$PATH"
 which nasm
 which protoc
 
@@ -26,14 +27,15 @@ scripts/build-ffmpeg.sh . \
 	--enable-d3d11va --enable-hwaccel=h264_d3d11va --enable-hwaccel=hevc_d3d11va
 FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
 ls -lR ffmpeg-prefix
+[[ -d ffmpeg-prefix/bin ]] && file ffmpeg-prefix/bin/*
+[[ -d ffmpeg-prefix/lib ]] && file ffmpeg-prefix/lib/*
 
-wget https://mirror.firedaemon.com/OpenSSL/openssl-1.1.1s.zip && 7z x openssl-1.1.1s.zip
-OPENSSL_ROOT="$(cygpath -m "$(realpath openssl-1.1/x64)")"
-
-PYTHON="C:/Python37-x64/python.exe"
-"$PYTHON" -m pip install protobuf==3.20.*
+OPENSSL_ROOT="C:/OpenSSL-v111-Win64"
 
 QT_ROOT="C:/Qt/5.15/msvc2019_64"
+
+PYTHON="C:/Python311-x64/python.exe"
+"$PYTHON" -m pip install protobuf==3.20.*
 
 COPY_DLLS="$OPENSSL_ROOT/bin/libcrypto-1_1-x64.dll $OPENSSL_ROOT/bin/libssl-1_1-x64.dll"
 

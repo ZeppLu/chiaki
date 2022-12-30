@@ -3,6 +3,9 @@
 set -xe
 
 # temp test
+vcpkg install --triplet x64-windows yasm
+VCPKG_ROOT="C:/tools/vcpkg/installed/x64-windows"
+export PATH="$(cygpath $VCPKG_ROOT)/tools/yasm:$PATH"
 scripts/build-ffmpeg.sh . \
 	--target-os=win64 --arch=x86_64 --toolchain=msvc \
 	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
@@ -71,4 +74,4 @@ mkdir Chiaki-PDB && cp build/gui/chiaki.pdb Chiaki-PDB
 ls -lha Chiaki
 "$QT_ROOT/bin/windeployqt.exe" Chiaki/chiaki.exe
 ls -lha Chiaki
-cp -v $COPY_DLLS Chiaki
+cp -v $COPY_DLLS Chiaki || :

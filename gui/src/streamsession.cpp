@@ -97,12 +97,6 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	{
 		for(QAudioDeviceInfo di : QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
 		{
-			QString name = di.deviceName();
-			QString realm = di.realm();
-			CHIAKI_LOGI(GetChiakiLog(), "zepp audio out (name=%s, realm=%s)",
-					qPrintable(name), qPrintable(realm));
-			CHIAKI_LOGI(GetChiakiLog(), "zepp audio out (name=%s, realm=%s)",
-					qUtf8Printable(name), qUtf8Printable(realm));
 			if(di.deviceName() == connect_info.audio_out_device)
 			{
 				audio_out_device_info = di;
@@ -375,6 +369,16 @@ void StreamSession::InitAudio(unsigned int channels, unsigned int rate)
 	audio_format.setSampleSize(16);
 	audio_format.setCodec("audio/pcm");
 	audio_format.setSampleType(QAudioFormat::SignedInt);
+
+	for(QAudioDeviceInfo di : QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+	{
+		QString name = di.deviceName();
+		QString realm = di.realm();
+		CHIAKI_LOGI(log.GetChiakiLog(), "zepp audio out (name=%s, realm=%s)",
+				qPrintable(name), qPrintable(realm));
+		CHIAKI_LOGI(log.GetChiakiLog(), "zepp audio out utf8 (name=%s, realm=%s)",
+				qUtf8Printable(name), qUtf8Printable(realm));
+	}
 
 	QAudioDeviceInfo audio_device_info = audio_out_device_info;
 	if(!audio_device_info.isFormatSupported(audio_format))

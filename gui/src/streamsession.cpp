@@ -97,6 +97,12 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	{
 		for(QAudioDeviceInfo di : QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
 		{
+			QString name = di.deviceName();
+			QString realm = di.realm();
+			CHIAKI_LOGI(GetChiakiLog(), "zepp audio out (name=%s, realm=%s)",
+					qPrintable(name), qPrintable(realm));
+			CHIAKI_LOGI(GetChiakiLog(), "zepp audio out (name=%s, realm=%s)",
+					qUtf8Printable(name), qUtf8Printable(realm));
 			if(di.deviceName() == connect_info.audio_out_device)
 			{
 				audio_out_device_info = di;

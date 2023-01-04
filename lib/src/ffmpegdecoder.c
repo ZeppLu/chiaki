@@ -66,6 +66,9 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ffmpeg_decoder_init(ChiakiFfmpegDecoder *de
 				CHIAKI_LOGE(log, "avcodec_get_hw_config failed");
 				goto error_codec_context;
 			}
+			const char* hw_dev_name = av_hwdevice_get_type_name(config->device_type);
+			bool bit_set = config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX;
+			CHIAKI_LOGI(log, "avcodec_get_hw_config(%d)=%s, bit=%d", i, hw_dev_name, bit_set);
 			if(config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX && config->device_type == type)
 			{
 				decoder->hw_pix_fmt = config->pix_fmt;

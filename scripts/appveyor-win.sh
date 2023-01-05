@@ -21,8 +21,8 @@ vcpkg install --triplet $VCPKG_TRIPLET opus sdl2
 # Build ffmpeg with hardware decoders on Windows
 scripts/build-ffmpeg.sh . \
 	--target-os=win64 --arch=x86_64 --toolchain=msvc \
-	--enable-dxva2 --enable-hwaccel=h264_dxva2 --enable-hwaccel=hevc_dxva2 \
-	--enable-d3d11va --enable-hwaccel=h264_d3d11va --enable-hwaccel=hevc_d3d11va
+	--enable-hwaccel=h264_dxva2 --enable-hwaccel=h264_d3d11va --enable-hwaccel=h264_d3d11va2 \
+	--enable-hwaccel=hevc_dxva2 --enable-hwaccel=hevc_d3d11va --enable-hwaccel=hevc_d3d11va2
 FFMPEG_ROOT="$(cygpath -m "$(realpath ffmpeg-prefix)")"  # `cygpath -m` converts path to `C:/...`
 
 OPENSSL_ROOT="C:/OpenSSL-v111-Win64"
